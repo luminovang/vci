@@ -44,14 +44,19 @@ package_build_repo_structure() {
     # Capture excluded files BEFORE rsync
     #
     local boot_src="$src/src/Boot.php"
+    local novakit_cli="$src/novakit"
     local const_src="$src/install/Boot/constants.php"
 
     if [ -f "$boot_src" ]; then
         cp -f "$boot_src" "$metadata/system/Boot.php"
     fi
 
-    if [ -f "$const_src" ]; then
-        cp -f "$const_src" "$metadata/bootstrap/constants.php"
+    # if [ -f "$const_src" ]; then
+    #     cp -f "$const_src" "$metadata/bootstrap/constants.php"
+    # fi
+
+    if [ -f "$novakit_cli" ]; then
+        cp -f "$novakit_cli" "$metadata/novakit"
     fi
 
     #
@@ -65,7 +70,6 @@ package_build_repo_structure() {
     # Sync bootstrap (clean mirror)
     #
     rsync -a --delete \
-        --exclude='constants.php' \
         "$src/install/Boot/" "$dest/bootstrap/"
 
     # Ensure runtime is writable if PHP will modify it later
@@ -259,8 +263,8 @@ package_clear_modules() {
 package_remove_module() {
     local packages="${1:-${PACKAGES_DIR}}"
     local base="${2:-${SCRIPT_DIR}}"
-    local target="$3"
-    local force="$4"
+    local force="$3"
+    local target="$4"
     local releases="$packages/releases"
     local current="$packages/current"
 
