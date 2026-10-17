@@ -25,7 +25,7 @@ if ! (return 0 2>/dev/null); then
     set -euo pipefail
 fi
 
-readonly VERSION="1.3.2"
+readonly VERSION="1.3.3"
 readonly PRODUCTION=1
 readonly SELF_REPO_URL="https://github.com/luminovang/vci.git"
 readonly PACKAGE_REPO_URL="https://github.com/luminovang/framework.git"
@@ -354,11 +354,11 @@ if [ "$COMMAND_ACTION" = "remove" ]; then
 
     case "$REMOVE_ACTION" in
         all)
-            package_clear_modules "$PACKAGES_DIR" "$SCRIPT_DIR" "$FORCE"
+            package_clear_modules "$PACKAGES_DIR" "$SCRIPT_DIR" "$FORCE" ""
             exit $?
             ;;
         *)
-            package_remove_module "$PACKAGES_DIR" "$SCRIPT_DIR" "$RESET_TARGET" "$FORCE"
+            package_remove_module "$PACKAGES_DIR" "$SCRIPT_DIR" "$FORCE" "$REMOVE_ACTION"
             exit $?
             ;;
     esac
