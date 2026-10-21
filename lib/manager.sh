@@ -2,7 +2,7 @@
 manager_detect_version() {
     local dir="$1"
 
-    get_version bash "$dir/luminova.sh" && return 0
+    get_version bash "$dir/phpvci.sh" && return 0
     get_version git "$dir" && return 0
     get_version composer "$dir/composer.json" && return 0
     return 1
@@ -49,15 +49,15 @@ manager_copy_updates() {
     return 0
 }
 
-# Install this script to the system PATH as 'luminova'
-# Install luminova into a system executable PATH.
+# Install this script to the system PATH as 'phpvci'
+# Install phpvci into a system executable PATH.
 self_install_script() {
     local runtime="${1:-root}"
     local script_path="$2"
     local default_target="${3:-}"
     local install_dir=""
     local target=""
-    local bin_name="luminova"
+    local bin_name="phpvci"
     local conf_file=""
 
     if [ -z "$default_target" ]; then
@@ -66,7 +66,7 @@ self_install_script() {
             default_target=""
         }
 
-        if [ -n "$default_target" ] && _confirm "Install luminova to '$default_target'" "Y"; then
+        if [ -n "$default_target" ] && _confirm "Install phpvci to '$default_target'" "Y"; then
             install_dir="$(dirname "$default_target")"
         fi
     else
@@ -104,7 +104,7 @@ self_install_script() {
     if [ -e "$target" ] || [ -L "$target" ]; then
         _print "Already installed:" warn 1
         _print "  $target" plain
-        _print "Use '--self=uninstall' to remove luminova binary." info
+        _print "Use '--self=uninstall' to remove phpvci binary." info
         exit 1
     fi
 
@@ -139,11 +139,11 @@ self_install_script() {
     if [ -n "$conf_file" ]; then
         _print "  Writing configurations to '$conf_file'" plain
         config_write "$conf_file" \
-            "LUMINOVA_VCI_BIN=$target" \
-            "LUMINOVA_VCI_CONF=$conf_file"
+            "PHPVCI_BIN=$target" \
+            "PHPVCI_CONF=$conf_file"
     fi
 
-    if ! _command_exists "luminova"; then
+    if ! _command_exists "phpvci"; then
         if _confirm "Add '$install_dir' to PATH" "Y"; then
             config_add_global_path "$install_dir"
         else
@@ -160,7 +160,7 @@ self_install_script() {
     exit 0
 }
 
-# Remove the installed 'luminova' binary and optionally purge data directories
+# Remove the installed 'phpvci' binary and optionally purge data directories
 self_uninstall_script() {
     local runtime="${1:-root}"
     local purge="${2:-0}"
@@ -172,17 +172,17 @@ self_uninstall_script() {
     local conf_file mode="file"
 
     # Resolve installation target
-    target="$(config_get "LUMINOVA_VCI_BIN")" || target=""
+    target="$(config_get "PHPVCI_BIN")" || target=""
 
     if [ -z "$target" ]; then
         target="$(config_script_target_bin "$runtime")" || target=""
     fi
 
     if [ -z "$target" ]; then
-        if _command_exists "luminova"; then
-            target="$(command -v luminova 2>/dev/null)" || target=""
+        if _command_exists "phpvci"; then
+            target="$(command -v phpvci 2>/dev/null)" || target=""
         else
-            _print "Luminova is not installed." warn 1
+            _print "phpvci is not installed." warn 1
             exit 1
         fi
     fi
@@ -194,7 +194,7 @@ self_uninstall_script() {
 
     # Validate existence
     if [ ! -e "$target" ] && [ ! -L "$target" ]; then
-        _print "Luminova not found at: $target" warn 1
+        _print "phpvci not found at: $target" warn 1
         exit 1
     fi
 
@@ -205,7 +205,7 @@ self_uninstall_script() {
 
     # Safety confirmation
     if [[ "$is_local" -eq 1 || ( -e "$target" && ! -L "$target" ) ]]; then
-        _print "Removing full Luminova installation:" warn 1
+        _print "Removing full phpvci installation:" warn 1
         _print "  $target" plain
 
         if ! _confirm "Continue" "N"; then
@@ -216,7 +216,7 @@ self_uninstall_script() {
 
     # Remove binary
     if [ "$is_local" -eq 1 ]; then
-        _print "Removing full Luminova installation directory:" warn 1
+        _print "Removing full phpvci installation directory:" warn 1
         _print "  $main_dir" plain
 
         rm -rf "$main_dir" || {
@@ -245,7 +245,7 @@ self_uninstall_script() {
         conf_file="$(config_get_file)"
 
         if [ -n "$conf_file" ]; then
-            config_write "$conf_file" "LUMINOVA_VCI_BIN=$main_script"
+            config_write "$conf_file" "PHPVCI_BIN=$main_script"
         fi
     fi
 
@@ -261,7 +261,7 @@ self_uninstall_script() {
 # Replace the installed script with the latest version downloaded from GitHub.
 #
 # Steps:
-#   1. Resolve where luminova is installed.
+#   1. Resolve where phpvci is installed.
 #   2. Download to a temp file (curl preferred, wget as fallback).
 #   3. Validate syntax with bash -n.
 #   4. Compare VERSION strings; skip if already current.
@@ -276,12 +276,12 @@ self_update_script() {
 
     local isolation handler new_version new_script
 
-    isolation="$(_make_temp dir "" "luminova.vci.update.isolation")" || {
+    isolation="$(_make_temp dir "" "phpvci.update.isolation")" || {
         _print "Failed to prepare update workspace: $isolation" error 1 1
         exit 1
     }
 
-    tmp="$(_make_temp file "$destination/tmp" "luminova.vci.update")" || {
+    tmp="$(_make_temp file "$destination/tmp" "phpvci.update")" || {
         rm -f "$isolation"
         _print "Failed to create a temporary download file." error 1 1
         exit 1
@@ -297,7 +297,7 @@ self_update_script() {
     fi
 
     new_version="$(manager_detect_version "$isolation")"
-    new_script="$isolation/luminova.sh"
+    new_script="$isolation/phpvci.sh"
 
     if [ -n "$cur_version" ] && [ -n "$new_version" ] && [ "$cur_version" = "$new_version" ]; then
         _print "Already up to date ($cur_version)." info 1
@@ -306,7 +306,7 @@ self_update_script() {
     fi
 
     if [ ! -f "$new_script" ]; then
-        _print "Update failed: missing luminova.sh in source." error 1 1
+        _print "Update failed: missing phpvci.sh in source." error 1 1
         rm -f "$tmp" "$isolation"
         return 1
     fi
