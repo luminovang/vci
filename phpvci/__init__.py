@@ -1,18 +1,18 @@
 """
-luminova — Python wrapper for the Luminova Version Control Interface.
+VCI — Python wrapper for the Luminova Version Control Interface.
 
-Provides a CLI entry point and a programmatic API for running luminova.sh
+Provides a CLI entry point and a programmatic API for running phpvci.sh
 from Python code or build pipelines.
 
 Typical usage
 -------------
 Command line (after pip install):
-    luminova package --install=3.8.9
-    luminova package --list
-    luminova self --update
+    phpvci package --install=3.8.9
+    phpvci package --list
+    phpvci self --update
 
 Programmatic:
-    from luminova import runner
+    from phpvci import runner
     exit_code = runner.run(["package", "--install=3.8.9", "--runtime=user"])
 """
 
