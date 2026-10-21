@@ -39,22 +39,22 @@ _setup() {
     # -----------------------------
     # Resolve binary path
     # -----------------------------
-    if config_has "LUMINOVA_VCI_BIN"; then
-        bin_file="$(config_get "LUMINOVA_VCI_BIN")"
+    if config_has "PHPVCI_BIN"; then
+        bin_file="$(config_get "PHPVCI_BIN")"
     fi
 
     # -----------------------------
     # Resolve package directory
     # -----------------------------
-    if config_has "LUMINOVA_PACKAGE_DIR"; then
-        old_packages="$(config_get "LUMINOVA_PACKAGE_DIR")"
+    if config_has "PHPVCI_PACKAGE_DIR"; then
+        old_packages="$(config_get "PHPVCI_PACKAGE_DIR")"
 
         if [ -n "$old_packages" ] && [ "$old_packages" != "$packages" ]; then
 
             if [ "$is_update_pkg_path" -eq 0 ]; then
                 _print "Mixed target package directory" warn
             else
-                _print "Changing luminova package target directory" info
+                _print "Changing phpvci package target directory" info
             fi
             
             _print "Previous package directory: $old_packages" plain
@@ -74,8 +74,8 @@ _setup() {
                 fi
             else
                 config_write "$config_file" \
-                    "LUMINOVA_VCI_CONF=$config_file" \
-                    "LUMINOVA_VCI_BIN=$bin_file"
+                    "PHPVCI_CONF=$config_file" \
+                    "PHPVCI_BIN=$bin_file"
                     
                 return 1
                 # packages="$old_packages"
@@ -87,9 +87,9 @@ _setup() {
     # Write config atomically
     # -----------------------------
     config_write "$config_file" \
-        "LUMINOVA_VCI_CONF=$config_file" \
-        "LUMINOVA_PACKAGE_DIR=$packages" \
-        "LUMINOVA_VCI_BIN=$bin_file" || {
+        "PHPVCI_CONF=$config_file" \
+        "PHPVCI_PACKAGE_DIR=$packages" \
+        "PHPVCI_BIN=$bin_file" || {
 
         if [ "$is_update_pkg_path" -eq 1 ]; then
             _print "Failed to update package configuration" error 0 1
@@ -120,7 +120,7 @@ _setup() {
     fi
 
     if [ "$is_update_pkg_path" -eq 1 ]; then
-        _print "Luminova package directory was updated" success
+        _print "Package directory was updated" success
         _print "New package directory: $packages" plain
     fi
 
@@ -533,7 +533,7 @@ _confirm_path() {
 # Create a temp file or directory in a given dir with a sanitized name prefix
 _make_temp() {
     local type="${1:-file}"
-    local dir="${2:-${TMPDIR:-/tmp}/luminova}"
+    local dir="${2:-${TMPDIR:-/tmp}/phpvci}"
     local name="${3:-test}"
 
     # local tmp="$(config_path 2>/dev/null)" || true
