@@ -1,8 +1,8 @@
 """
-runner.py — Low-level subprocess executor for luminova.sh.
+runner.py — Low-level subprocess executor for phpvci.sh.
 
 Responsible for:
-  - Locating the luminova.sh script relative to this package
+  - Locating the phpvci.sh script relative to this package
   - Executing it via bash with the supplied argument list
   - Streaming stdout/stderr live (no buffering)
   - Passing the shell exit code back to the caller
@@ -15,17 +15,17 @@ import subprocess
 import sys
 from pathlib import Path
 
-# luminova.sh lives one level above the luminova/ Python package directory
-_SCRIPT_NAME = "luminova.sh"
+# phpvci.sh lives one level above the phpvci/ Python package directory
+_SCRIPT_NAME = "phpvci.sh"
 _PACKAGE_DIR = Path(__file__).resolve().parent
 _SCRIPT_PATH = _PACKAGE_DIR.parent / _SCRIPT_NAME
 
 
 def _find_script() -> Path:
-    """Return the absolute path to luminova.sh, raising if it is missing."""
+    """Return the absolute path to phpvci.sh, raising if it is missing."""
     if not _SCRIPT_PATH.exists():
         raise FileNotFoundError(
-            f"luminova.sh not found at expected location: {_SCRIPT_PATH}\n"
+            f"phpvci.sh not found at expected location: {_SCRIPT_PATH}\n"
             "Re-install the package or run from the repository root."
         )
     return _SCRIPT_PATH
@@ -33,12 +33,12 @@ def _find_script() -> Path:
 
 def run(list[str], *, env: dict[str, str] | None = None) -> int:
     """
-    Execute luminova.sh with *args* and return its exit code.
+    Execute phpvci.sh with *args* and return its exit code.
 
     Parameters
     ----------
     args:
-        Command-line arguments forwarded verbatim to luminova.sh.
+        Command-line arguments forwarded verbatim to phpvci.sh.
     env:
         Optional environment overrides merged on top of the current process
         environment.  Pass ``{"DEBUG": "1"}`` to enable bash xtrace.
@@ -51,7 +51,7 @@ def run(list[str], *, env: dict[str, str] | None = None) -> int:
     Raises
     ------
     FileNotFoundError
-        If luminova.sh cannot be located.
+        If phpvci.sh cannot be located.
     """
     script = _find_script()
 
@@ -69,7 +69,7 @@ def run(list[str], *, env: dict[str, str] | None = None) -> int:
 
 def run_or_exit(args: list[str], *, env: dict[str, str] | None = None) -> None:
     """
-    Execute luminova.sh and call ``sys.exit`` with the resulting exit code.
+    Execute phpvci.sh and call ``sys.exit`` with the resulting exit code.
 
     Convenience wrapper used by the CLI entry point so that the Python
     process mirrors the shell script's exit behavior exactly.
