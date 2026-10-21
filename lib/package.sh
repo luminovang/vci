@@ -342,7 +342,7 @@ package_current_release() {
         exit 1
     fi
 
-    _print "Active Luminova release:" info
+    _print "Active package release:" info
     _print "$current" success
     exit 0
 }
