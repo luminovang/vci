@@ -13,11 +13,11 @@ print_helps() {
 }
 
 show_info() {
-    local name="${1:-luminova}"
+    local name="${1:-phpvci}"
     local version="${VERSION:-unknown}"
 
     cat <<EOF
-$name - Luminova VCI Manager
+$name - PHP VCI Manager
 Version: $version
 
 Packages:
@@ -41,10 +41,10 @@ EOF
 }
 
 package_helps() {
-    local name="${1:-luminova}"
+    local name="${1:-phpvci}"
     cat <<EOF
-Luminova Version Control Interface
-Manage shared Luminova PHP framework releases.
+PHP Version Control Interface
+Manage shared PHP framework releases.
 
 Usage:
   $name package <options>
@@ -53,7 +53,7 @@ Install or update a release:
   $name package --install
   $name package --install=3.8.0
   $name package --install=3.8.0 --runtime=root
-  $name package --install=3.8.0 --path=/etc/luminova/packages
+  $name package --install=3.8.0 --path=/etc/phpvci/packages
   $name package --install=3.8.0 --delete
   $name package --install=3.8.0 --lock
   $name package --install=3.8.0 --lock-mode=755
@@ -107,10 +107,10 @@ EOF
 }
 
 self_script_helps() {
-    local name="${1:-luminova}"
+    local name="${1:-phpvci}"
     cat <<EOF
-Luminova Version Control Interface
-Manage the Luminova VCI script itself.
+PHP Version Control Interface
+Manage the PHP VCI script itself.
 
 Usage:
   $name self <options>
@@ -124,20 +124,20 @@ Examples:
 
 Options:
   -h, --help                      Show this help message
-  -i, --install                   Install this script as 'luminova' in PATH
+  -i, --install                   Install this script as 'phpvci' in PATH
   -u, --update[=<version>]        Replace the installed binary with the latest from GitHub
-  -ui, --uninstall                Remove the installed 'luminova' binary or main installation
+  -ui, --uninstall                Remove the installed 'phpvci' binary or main installation
   -b, --branch=<ref>              Git branch or tag to use with --update
-  -p, --purge                     Also remove vci.conf when running --uninstall
+  -p, --purge                     Also remove config.conf when running --uninstall
 EOF
     exit 0
 }
 
 global_helps() {
-    local name="${1:-luminova}"
+    local name="${1:-phpvci}"
     cat <<EOF
-Luminova Version Control Interface
-Manages versioned deployments of the Luminova PHP framework across a shared
+PHP Version Control Interface
+Manages versioned deployments of the PHP framework across a shared
 installation directory.
 
 Usage:
