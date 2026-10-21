@@ -1,4 +1,4 @@
-![PHP Luminova VCI](https://github.com/phpvci/admin/blob/main/logo.svg?v=2)
+![PHP Luminova VCI](https://github.com/luminovang/phpvci-admin/blob/main/logo.svg?v=2)
 
 # PHP Luminova — Version Control Interface (VCI)
 
@@ -26,7 +26,7 @@ Think of it like a PHP version manager (e.g. `phpenv`), but for the Luminova fra
 ## How it works
 
 ```
-/opt/luminova/packages/
+/opt/phpvci/packages/
     releases/
         3.8.0/      ← a full framework build
         3.9.0/      ← another build
@@ -36,7 +36,7 @@ Think of it like a PHP version manager (e.g. `phpenv`), but for the Luminova fra
 Your PHP projects reference `packages/current/`. When you run `package --switch=3.9.0`, only
 the symlink changes. No files are copied, no projects need to be restarted.
 
-A `vci.conf` file records the VCI binary location and packages directory. A future VCI
+A `phpvci.conf` file records the VCI binary location and packages directory. A future VCI
 switcher UI will use this file to manage versions without shell access.
 
 ---
@@ -73,23 +73,23 @@ Python CLI wrapper). Choose the one that fits your workflow.
 ssh user@your-server
 
 # Create the installation directory
-sudo mkdir -p /opt/luminova
+sudo mkdir -p /opt/phpvci
 
 # Clone the VCI into it
-sudo git clone https://github.com/luminovang/vci.git /opt/luminova
+sudo git clone https://github.com/luminovang/phpvci.git /opt/phpvci
 
 # Make the script executable
-sudo chmod +x /opt/luminova/luminova.sh
+sudo chmod +x /opt/phpvci/phpvci.sh
 
-# Register it as a global command (so you can run 'luminova' from anywhere)
-sudo /opt/luminova/luminova.sh self --install
+# Register it as a global command (so you can run 'phpvci' from anywhere)
+sudo /opt/phpvci/phpvci.sh self --install
 ```
 
-After the last step, the `luminova` command is available system-wide.
+After the last step, the `phpvci` command is available system-wide.
 
 > **User-mode install (no root required)**
 > Drop `sudo` from the commands above and use `--runtime=user`. The script will install to
-> `~/.local/bin/luminova` instead of `/usr/local/bin/luminova`.
+> `~/.local/bin/phpvci` instead of `/usr/local/bin/phpvci`.
 
 ---
 
@@ -98,16 +98,16 @@ After the last step, the `luminova` command is available system-wide.
 If you prefer Python tooling or want to use the VCI inside build pipelines:
 
 ```bash
-pip install git+https://github.com/luminovang/vci.git
+pip install git+https://github.com/luminovang/phpvci.git
 ```
 
 Pin to a specific version:
 
 ```bash
-pip install git+https://github.com/luminovang/vci.git@v2.1.0
+pip install git+https://github.com/luminovang/phpvci.git@v2.1.0
 ```
 
-The `luminova` command installed by pip accepts all the same flags as the shell script. See
+The `phpvci` command installed by pip accepts all the same flags as the shell script. See
 [Python usage](#python-api) for programmatic access.
 
 ---
@@ -117,7 +117,7 @@ The `luminova` command installed by pip accepts all the same flags as the shell 
 If you cannot clone directly on the server, upload the files from your local machine first:
 
 ```bash
-scp -r /path/to/vci/. user@your-server:/opt/luminova/
+scp -r /path/to/phpvci/. user@your-server:/opt/phpvci/
 ```
 
 Then SSH in and follow the steps from Option A starting at `chmod +x`.
@@ -129,8 +129,8 @@ Then SSH in and follow the steps from Option A starting at `chmod +x`.
 After installation, your directory will look like this:
 
 ```
-/opt/luminova/
-    luminova.sh               ← main VCI script
+/opt/phpvci/
+    phpvci.sh               ← main VCI script
     lib/                      ← internal modules (do not edit)
     packages/
         repo/                 ← temporary git clone used during builds
@@ -140,14 +140,14 @@ After installation, your directory will look like this:
         current  →            ← symlink to the active release
 ```
 
-`vci.conf` is saved to the first writable location found in this order:
+`config.conf` is saved to the first writable location found in this order:
 
 ```
-/etc/luminova/
-/var/lib/luminova/
-~/.config/.luminova/
-~/.local/share/.luminova/
-~/.luminova/
+/etc/phpvci/
+/var/lib/phpvci/
+~/.config/.phpvci/
+~/.local/share/.phpvci/
+~/.phpvci/
 ```
 
 ---
@@ -159,13 +159,13 @@ Once the VCI itself is installed, use it to install Luminova framework versions.
 **Install the latest version** (auto-detected from git tags):
 
 ```bash
-sudo luminova package --install
+sudo phpvci package --install
 ```
 
 **Install a specific version:**
 
 ```bash
-sudo luminova package --install=3.8.0
+sudo phpvci package --install=3.8.0
 ```
 
 What happens during install:
@@ -174,7 +174,7 @@ What happens during install:
 2. The requested version is checked out and built into `packages/releases/3.8.0/`
 3. `packages/current` is updated to point at the new release
 4. A content hash is saved so identical rebuilds are skipped automatically
-5. `vci.conf` is written with the binary path and packages directory
+5. `config.conf` is written with the binary path and packages directory
 
 > **Running the same install command twice is safe.**
 > The VCI compares content hashes and skips the rebuild if nothing has changed. Use
@@ -184,31 +184,31 @@ What happens during install:
 
 ## Configuring your PHP project
 
-Add a `.luminova.php` file to the root of each project. This tells the framework where to find
+Add a `.phpvci.php` file to the root of each project. This tells the framework where to find
 the shared installation.
 
 ```php
 <?php
-// .luminova.php (project root)
+// .phpvci.php (project root)
 return [
 
     // Enable shared framework resolution
-    'resolve.paths' => true,
+    'enabled' => true,
 
     // Autoloader strategy:
     //   'auto'     → prefer Composer, fall back to Luminova's own loader
     //   'composer' → Composer only
-    //   'luminova' → Luminova's loader only
-    'resolve.autoloader' => 'auto',
+    //   'framework' → Luminova's loader only
+    'autoloader' => 'auto',
 
     // Minimum required framework version
-    'luminova.version' => '>=3.8',
+    'version' => '>=3.8',
 
     // Paths to the shared framework
     // 'current' always follows the active symlink
-    'luminova.paths' => [
-        'root'      => '/opt/luminova/packages',
-        'target'    => '/opt/luminova/packages/current',
+    'paths' => [
+        'root'      => '/opt/phpvci/packages',
+        'target'    => '/opt/phpvci/packages/current',
     ],
 ];
 ```
@@ -216,7 +216,7 @@ return [
 **To pin a project to a specific version** instead of always following `current`:
 
 ```php
-'target' => '/opt/luminova/packages/releases/3.8.0',
+'target' => '/opt/phpvci/packages/releases/3.8.0',
 ```
 
 ---
@@ -226,7 +226,7 @@ return [
 ### List all installed releases
 
 ```bash
-sudo luminova package --list
+sudo phpvci package --list
 ```
 
 Example output:
@@ -241,13 +241,13 @@ Installed releases:
 ### Check the active version
 
 ```bash
-sudo luminova package --current
+sudo phpvci package --current
 ```
 
 ### Switch to a different release (instant, no rebuild)
 
 ```bash
-sudo luminova package --switch=3.9.0
+sudo phpvci package --switch=3.9.0
 ```
 
 This only works if the target version is already installed. Only the symlink is updated — no
@@ -256,13 +256,13 @@ files are copied or rebuilt.
 ### Update to the latest version
 
 ```bash
-sudo luminova package --update
+sudo phpvci package --update
 ```
 
 Or update to a specific version:
 
 ```bash
-sudo luminova package --update=3.9.0
+sudo phpvci package --update=3.9.0
 ```
 
 `--update` always rebuilds from source and bypasses the hash check. Use it when you want to
@@ -272,10 +272,10 @@ force reinstallation of a version that is already present.
 
 ```bash
 # See what is installed
-sudo luminova package --list
+sudo phpvci package --list
 
 # Switch back
-sudo luminova package --switch=3.8.0
+sudo phpvci package --switch=3.8.0
 ```
 
 No rebuild needed. Projects resume using `3.8.0` immediately.
@@ -287,8 +287,8 @@ No rebuild needed. Projects resume using `3.8.0` immediately.
 ### Install from a specific git branch
 
 ```bash
-sudo luminova package --install --branch=develop
-sudo luminova package --install=3.8.0 --branch=hotfix/3.8.x
+sudo phpvci package --install --branch=develop
+sudo phpvci package --install=3.8.0 --branch=hotfix/3.8.x
 ```
 
 When combined with `--install=<version>`, the tag is checked out within that branch. When used
@@ -296,26 +296,26 @@ with `--install` alone, the latest tag on that branch is auto-detected.
 
 ### Change the packages directory
 
-By default, packages are stored in `packages/` next to `luminova.sh`. Override this with
+By default, packages are stored in `packages/` next to `phpvci.sh`. Override this with
 `--path`:
 
 ```bash
-sudo luminova package --install=3.8.0 --path=/srv/luminova/shared
+sudo phpvci package --install=3.8.0 --path=/srv/phpvci/shared
 ```
 
 Print the current VCI script directory and configured paths:
 
 ```bash
-luminova --paths
+phpvci --paths
 ```
 
 Print the path to a specific directory:
 
 ```bash
-luminova --where=packages
-luminova --where=release
-luminova --where=current
-luminova --where=repo
+phpvci --where=packages
+phpvci --where=release
+phpvci --where=current
+phpvci --where=repo
 ```
 
 ### Force a fresh clone
@@ -323,7 +323,7 @@ luminova --where=repo
 Use `--force` when the local repo clone is corrupted or you want a clean start:
 
 ```bash
-sudo luminova package --install=3.8.0 --force
+sudo phpvci package --install=3.8.0 --force
 ```
 
 This deletes the `repo/` directory and re-clones from scratch. It also disables the hash check
@@ -334,7 +334,7 @@ for that run.
 `repo/` is only needed during the build. Use `--delete` to remove it afterwards:
 
 ```bash
-sudo luminova package --install=3.8.0 --delete
+sudo phpvci package --install=3.8.0 --delete
 ```
 
 The `.git` folder is preserved so future updates are incremental rather than full re-clones.
@@ -345,13 +345,13 @@ On production servers, restrict the packages directory so only root can modify i
 
 ```bash
 # Default mode (755) — recommended for most setups
-sudo luminova package --install=3.8.0 --lock
+sudo phpvci package --install=3.8.0 --lock
 
 # Stricter mode (555) — read and execute only, no writes even for root
-sudo luminova package --install=3.8.0 --lock --mode=555
+sudo phpvci package --install=3.8.0 --lock --mode=555
 
 # Equivalent long form with an explicit mode
-sudo luminova package --install=3.8.0 --lock-mode=555
+sudo phpvci package --install=3.8.0 --lock-mode=555
 ```
 
 ---
@@ -361,7 +361,7 @@ sudo luminova package --install=3.8.0 --lock-mode=555
 ### Remove a specific version
 
 ```bash
-sudo luminova package --remove=3.7.8
+sudo phpvci package --remove=3.7.8
 ```
 
 If the removed version was active, the VCI automatically promotes the next latest installed
@@ -370,7 +370,7 @@ release and updates the symlink.
 ### Free up disk space (remove the repo clone only)
 
 ```bash
-sudo luminova package --remove=repo
+sudo phpvci package --remove=repo
 ```
 
 This removes the temporary `repo/` directory but does not touch `releases/` or `current`.
@@ -378,7 +378,7 @@ This removes the temporary `repo/` directory but does not touch `releases/` or `
 ### Full reset — remove everything
 
 ```bash
-sudo luminova package --remove
+sudo phpvci package --remove
 ```
 
 > ⚠️ **Warning:**
@@ -388,37 +388,37 @@ sudo luminova package --remove
 ### Skip the confirmation prompt
 
 ```bash
-sudo luminova package --remove --force
-sudo luminova package --remove=3.7.8 --force
+sudo phpvci package --remove --force
+sudo phpvci package --remove=3.7.8 --force
 ```
 
 ---
 
 ## Self-management
 
-These commands manage the `luminova` VCI binary itself — not the framework packages.
+These commands manage the `phpvci` VCI binary itself — not the framework packages.
 
 ### Install as a global command
 
 ```bash
-# System-wide (requires root) → /usr/local/bin/luminova
-sudo ./luminova.sh self --install
+# System-wide (requires root) → /usr/local/bin/phpvci
+sudo ./phpvci.sh self --install
 
-# User-space (no root needed) → ~/.local/bin/luminova
-./luminova.sh self --install --runtime=user
+# User-space (no root needed) → ~/.local/bin/phpvci
+./phpvci.sh self --install --runtime=user
 ```
 
-A symlink is created so that changes to `luminova.sh` are reflected immediately. If the
+A symlink is created so that changes to `phpvci.sh` are reflected immediately. If the
 filesystem does not support symlinks, a plain copy is made instead.
 
 ### Update the VCI script from GitHub
 
 ```bash
 # Update to the latest version
-sudo luminova self --update
+sudo phpvci self --update
 
 # Update to a specific tag
-sudo luminova self --update --branch=v2.1.0
+sudo phpvci self --update --branch=v2.1.0
 ```
 
 The update process downloads to an isolated temp directory, validates the new script syntax
@@ -428,21 +428,21 @@ with `bash -n`, compares version strings, and only then replaces the installed b
 
 ```bash
 # Remove the binary only
-sudo luminova self --uninstall
+sudo phpvci self --uninstall
 
-# Remove the binary and vci.conf
-sudo luminova self --uninstall --purge
+# Remove the binary and config.conf
+sudo phpvci self --uninstall --purge
 ```
 
 ---
 
 ## Python API
 
-The `luminova` Python package provides a thin programmatic interface for build pipelines and
+The `phpvci` Python package provides a thin programmatic interface for build pipelines and
 deployment scripts.
 
 ```python
-from luminova import runner
+from phpvci import runner
 
 # Returns the shell exit code
 exit_code = runner.run(["package", "--install=3.8.0", "--runtime=user"])
@@ -461,28 +461,28 @@ runner.run(["package", "--install"], env={"DEBUG": "1"})
 
 ```bash
 # Self-management
-luminova self --install
-luminova self --update
-luminova self --update --branch=v2.1.0
-luminova self --uninstall --purge
+phpvci self --install
+phpvci self --update
+phpvci self --update --branch=v2.1.0
+phpvci self --uninstall --purge
 
 # Installing and updating
-luminova package --install
-luminova package --install=3.8.0
-luminova package --install=3.8.0 --runtime=root --lock-mode=755
-luminova package --install --branch=develop
-luminova package --update=3.9.0
-luminova package --update --force
+phpvci package --install
+phpvci package --install=3.8.0
+phpvci package --install=3.8.0 --runtime=root --lock-mode=755
+phpvci package --install --branch=develop
+phpvci package --update=3.9.0
+phpvci package --update --force
 
 # Switching and inspecting
-luminova package --switch=3.8.0
-luminova package --list
-luminova package --current
+phpvci package --switch=3.8.0
+phpvci package --list
+phpvci package --current
 
 # Cleanup
-luminova package --remove
-luminova package --remove=3.7.8
-luminova package --remove=repo --force
+phpvci package --remove
+phpvci package --remove=3.7.8
+phpvci package --remove=repo --force
 ```
 
 ---
@@ -521,12 +521,12 @@ luminova package --remove=repo --force
 
 | Flag | Short | Description |
 |------|-------|-------------|
-| `--install` | `-i` | Install this script as `luminova` in PATH |
+| `--install` | `-i` | Install this script as `phpvci` in PATH |
 | `--update[=<version>]` | `-u` | Replace the installed binary with the latest from GitHub |
-| `--uninstall` | `-ui` | Remove the installed `luminova` binary |
+| `--uninstall` | `-ui` | Remove the installed `phpvci` binary |
 | `--branch=<ref>` | `-b` | Git branch or tag to use with `--update` |
 | `--runtime=<mode>` | `-ru` | Runtime mode: `root` \| `user` \| `auto` (default: `auto`) |
-| `--purge` | `-p` | Also remove `vci.conf` when running `--uninstall` |
+| `--purge` | `-p` | Also remove `config.conf` when running `--uninstall` |
 
 ---
 
@@ -537,8 +537,8 @@ luminova package --remove=repo --force
 The version is not in `releases/`. Run `--list` to see what is installed:
 
 ```bash
-sudo luminova package --list
-sudo luminova package --install=3.9.0   # install it if missing
+sudo phpvci package --list
+sudo phpvci package --install=3.9.0   # install it if missing
 ```
 
 ---
@@ -548,7 +548,7 @@ sudo luminova package --install=3.9.0   # install it if missing
 The repo clone failed or was removed. Force a clean re-clone:
 
 ```bash
-sudo luminova package --install=3.8.0 --force
+sudo phpvci package --install=3.8.0 --force
 ```
 
 ---
@@ -558,7 +558,7 @@ sudo luminova package --install=3.8.0 --force
 The content hash from the previous build matches the source. Use `--update` to bypass it:
 
 ```bash
-sudo luminova package --update=3.8.0
+sudo phpvci package --update=3.8.0
 ```
 
 ---
@@ -569,8 +569,8 @@ An interrupted build may have left a partial release without a hash file. The VC
 up automatically on the next run. If `current` is also broken, restore it manually:
 
 ```bash
-sudo rm /opt/luminova/packages/current
-sudo luminova package --switch=3.8.0
+sudo rm /opt/phpvci/packages/current
+sudo phpvci package --switch=3.8.0
 ```
 
 ---
@@ -581,9 +581,9 @@ Operations that write to `/opt/` require root. Add `sudo`, or use `--runtime=use
 user space (`~/.local/`):
 
 ```bash
-sudo luminova package --install=3.8.0
+sudo phpvci package --install=3.8.0
 # or
-luminova package --install=3.8.0 --runtime=user
+phpvci package --install=3.8.0 --runtime=user
 ```
 
 ---
@@ -593,7 +593,7 @@ luminova package --install=3.8.0 --runtime=user
 Discard the existing clone and start fresh:
 
 ```bash
-sudo luminova package --install=3.8.0 --branch=hotfix/3.8.x --force
+sudo phpvci package --install=3.8.0 --branch=hotfix/3.8.x --force
 ```
 
 ---
@@ -603,5 +603,5 @@ sudo luminova package --install=3.8.0 --branch=hotfix/3.8.x --force
 If the binary is in `/usr/local/bin/`, writing to it requires root:
 
 ```bash
-sudo luminova self --update
+sudo phpvci self --update
 ```
