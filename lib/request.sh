@@ -122,7 +122,7 @@ request_clone_repo() {
 
     # --- archive fallback ---
     if [ -z "$tmp" ]; then
-        tmp="$(_make_temp file "$destination/tmp" "luminova.vci.clones")" || {
+        tmp="$(_make_temp file "$destination/tmp" "phpvci.clones")" || {
             _print "Failed to create a temporary download file." error 1 1
             return 1
         }
@@ -328,7 +328,7 @@ request_sync_non_git_repo() {
     # --- non-git fallback ---
     _print "Syncing via archive (no git available)..." info
 
-    tmp="$(_make_temp dir "" "luminova_sync")" || return 1
+    tmp="$(_make_temp dir "" "phpvci_sync")" || return 1
 
     archive="$tmp/archive.zip"
 
