@@ -26,8 +26,8 @@ TMP_CONFIG_FILE=""
 # Install, update, or remove this script as a system command.
 #
 # Install paths:
-#   root → /usr/local/bin/luminova  (requires root)
-#   user → ~/.local/bin/luminova    (user-space, no root needed)
+#   root → /usr/local/bin/phpvci  (requires root)
+#   user → ~/.local/bin/phpvci    (user-space, no root needed)
 
 # Print the absolute install path for the given runtime mode
 config_script_target_bin() {
@@ -37,7 +37,7 @@ config_script_target_bin() {
     # 1. Prefer directories already in PATH
     for dir in "${COMMON_PATHS[@]}"; do
         if _in_executable_path "$dir" && [ -d "$dir" ] && [ -w "$dir" ]; then
-            printf "%s/luminova\n" "$dir"
+            printf "%s/phpvci\n" "$dir"
             return 0
         fi
     done
@@ -45,11 +45,11 @@ config_script_target_bin() {
     # 2. Fallback by runtime
     case "$runtime" in
         root)
-            printf "/usr/local/bin/luminova\n"
+            printf "/usr/local/bin/phpvci\n"
             return 0
             ;;
         user)
-            printf "%s/.local/bin/luminova\n" "$HOME"
+            printf "%s/.local/bin/phpvci\n" "$HOME"
             return 0
             ;;
         *)
@@ -70,9 +70,9 @@ config_path() {
     for dir in "${CONFIGURATION_PATHS[@]}"; do
         if _is_path_rw "$dir"; then
             if [[ "$dir" == "$HOME"* ]]; then
-                path="$dir/.luminova"
+                path="$dir/.phpvci"
             else
-                path="$dir/luminova"
+                path="$dir/phpvci"
             fi
 
             TMP_CONFIG_DIR="$path"
@@ -88,9 +88,9 @@ config_path() {
     # fallback if nothing writable
     if [ -n "$fallback" ]; then
         if [[ "$fallback" == "$HOME"* ]]; then
-            path="$fallback/.luminova"
+            path="$fallback/.phpvci"
         else
-            path="$fallback/luminova"
+            path="$fallback/phpvci"
         fi
 
         TMP_CONFIG_DIR="$path"
@@ -120,7 +120,7 @@ config_get_file() {
         return 1
     }
 
-    conf_file="$conf_dir/vci.conf"
+    conf_file="$conf_dir/config.conf"
 
     if [ "$check" -eq 1 ] && [ ! -f "$conf_file" ]; then
         return 1
@@ -132,7 +132,7 @@ config_get_file() {
     return 0
 }
 
-#value="$(config_get LUMINOVA_VCI_BIN)"
+#value="$(config_get PHPVCI_BIN)"
 #echo "$value"
 config_get() {
     local find="${1:-}"
@@ -162,6 +162,47 @@ config_get() {
     return 1
 }
 
+package_dir() {
+    local dir="${1:-$(pwd)}"
+    local parent
+    local input
+
+    dir="$(realpath "$dir" 2>/dev/null)" || {
+        printf 'Error: Cannot resolve directory: %s\n' "$dir" >&2
+        return 1
+    }
+
+    parent="$(dirname "$dir")"
+    dir="${parent}/phpvci.packages"
+
+    if mkdir -p "$dir" 2>/dev/null && chmod 755 "$dir" 2>/dev/null; then
+        printf '%s\n' "$dir"
+        return 0
+    fi
+
+    printf 'Failed to create or set permissions for package directory: %s\n' "$dir" >&2
+    printf 'Enter preferred package directory: ' >&2
+
+    # Read directly from the terminal when available.
+    if [[ -r /dev/tty ]]; then
+        read -r input </dev/tty || return 1
+    else
+        read -r input || return 1
+    fi
+
+    if [[ ! -d "$input" ]]; then
+        printf 'Error: Directory does not exist: %s\n' "$input" >&2
+        return 1
+    fi
+
+    if [[ ! -r "$input" || ! -x "$input" ]]; then
+        printf 'Error: Directory is not accessible: %s\n' "$input" >&2
+        return 1
+    fi
+
+    realpath "$input" || return 1
+}
+
 config_write() {
     local conf_target="$1"
     shift
@@ -176,8 +217,8 @@ config_write() {
     # Reject writes with a blank value for the key the PHP UI depends on
     for item in "$@"; do
         case "$item" in
-            LUMINOVA_PACKAGE_DIR=)
-                _print "Refusing to write empty LUMINOVA_PACKAGE_DIR to config" error 1 1
+            PHPVCI_PACKAGE_DIR=)
+                _print "Refusing to write empty PHPVCI_PACKAGE_DIR to config" error 1 1
                 return 1
                 ;;
         esac
@@ -188,9 +229,9 @@ config_write() {
     if [ -f "$conf_target" ]; then
        conf_file="$conf_target"
     elif [ -d "$conf_target" ]; then
-       conf_file="$conf_target/vci.conf"
+       conf_file="$conf_target/config.conf"
     elif [[ "$conf_target" != *.* || "$conf_target" == */ ]]; then
-        conf_file="${conf_target%/}/vci.conf"
+        conf_file="${conf_target%/}/config.conf"
     fi
 
     conf_dir="$(dirname "$conf_file")"
@@ -283,7 +324,7 @@ config_delete() {
     [ -n "$key" ] || return 1
     [ -f "$conf_file" ] || return 1
 
-    tmp="$(_make_temp file "$conf_file" ".tmp.vci.conf")" || return 1
+    tmp="$(_make_temp file "$conf_file" ".tmp.phpvci.config.conf")" || return 1
 
     while IFS= read -r line; do
         case "$line" in
@@ -354,7 +395,7 @@ config_add_global_path() {
     fi
 
     {
-        printf '\n# PHP Luminova (VCI)\n'
+        printf '\n# PHP VCI\n'
         printf 'export PATH="%s:$PATH"\n' "$target_dir"
     } >> "$rc_file"
 
