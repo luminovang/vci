@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # ------------------------------------------------------------
-# PHP Luminova — Version Control Interface
+# PHP Version Control Installation
 # ------------------------------------------------------------
-# Manages versioned deployments of the Luminova PHP framework
+# Manages versioned deployments of the PHP framework
 # across a shared installation directory.
 #
 # Features:
@@ -25,12 +25,15 @@ if ! (return 0 2>/dev/null); then
     set -euo pipefail
 fi
 
-readonly VERSION="1.3.3"
+readonly VERSION="1.3.4"
 readonly PRODUCTION=1
-readonly SELF_REPO_URL="https://github.com/luminovang/vci.git"
+
+# Framework repo
 readonly PACKAGE_REPO_URL="https://github.com/luminovang/framework.git"
+
 readonly _OS="$(uname -s)"
 readonly SCRIPT_ENTRY="${BASH_SOURCE[0]}"
+readonly SELF_REPO_URL="https://github.com/phpvci/phpvci.git"
 
 SOURCE="$SCRIPT_ENTRY"
 
@@ -67,9 +70,9 @@ _self_name() {
     local self="$1"
 
     if [ -L "$self" ]; then
-        printf "%s\n" "luminova"
+        printf "%s\n" "phpvci"
     else
-        printf "%s\n" "./luminova.sh"
+        printf "%s\n" "./phpvci.sh"
     fi
 }
 
@@ -117,7 +120,7 @@ _help() {
 }
 
 _version() {
-    _print "PHP Luminova — Shared Module Manager"
+    _print "PHP VCI — Shared Module Manager"
     _print "Version: $VERSION" success
     exit 0
 }
@@ -128,13 +131,13 @@ _paths() {
     _include "config"
 
     if [ -z "$where" ]; then
-        _print "Luminova VCI Paths" success
-        _print "LUMINOVA_VCI_SCRIPT_DIR=$SCRIPT_DIR"
+        _print "phpvci paths" success
+        _print "PHPVCI_SCRIPT_DIR=$SCRIPT_DIR"
 
         config_get
     else
-        if config_has "LUMINOVA_PACKAGE_DIR"; then
-            path="$(config_get LUMINOVA_PACKAGE_DIR)"
+        if config_has "PHPVCI_PACKAGE_DIR"; then
+            path="$(config_get PHPVCI_PACKAGE_DIR)"
         else
             path="$SCRIPT_DIR/packages"
         fi
@@ -176,10 +179,10 @@ for arg in "$@"; do
         --paths)                  _paths ;;
         -w=*|--where=*)           _paths "${arg#*=}" ;;
 
-        # Package Arguments (luminova package ...) ;;
+        # Package Arguments (phpvci package ...) ;;
 
         --path=*)                 PREFER_PACKAGES_DIR="${arg#*=}" ;;
-        --path)                   PREFER_PACKAGES_DIR="$(pwd)" ;;
+        # --path)                   PREFER_PACKAGES_DIR="$(pwd)" ;;
         -b=*|--branch=*)          TARGET_VERSION="${arg#*=}" ;;
         -l|--list)                COMMAND_ACTION="list" ;;
         -c|--current)             COMMAND_ACTION="show_current" ;;
@@ -187,13 +190,13 @@ for arg in "$@"; do
         -r=*|--remove=*)          COMMAND_ACTION="remove"; REMOVE_ACTION="${arg#*=}" ;;
         -s=*|--switch=*)          COMMAND_ACTION="switch"; TARGET_VERSION="${arg#*=}" ;;
 
-        # Package and Self arguments (luminova [package|self] ...) ;;
+        # Package and Self arguments (phpvci [package|self] ...) ;;
         -i|--install)             COMMAND_ACTION="install" ;;
         -u|--update)              COMMAND_ACTION="update" ;;
         -i=*|--install=*)         COMMAND_ACTION="install"; TARGET_VERSION="${arg#*=}" ;;
         -u=*|--update=*)          COMMAND_ACTION="update"; TARGET_VERSION="${arg#*=}" ;;
 
-        # Self only arguments (luminova self ...) ;;
+        # Self only arguments (phpvci self ...) ;;
         -ui|--uninstall)          COMMAND_ACTION="uninstall" ;;
 
         # Command tools arguments ;;
@@ -235,17 +238,18 @@ fi
 
 _include "config"
 
-
 if [ -n "$PREFER_PACKAGES_DIR" ]; then
     if [ "$SCRIPT_DIR" = "$PREFER_PACKAGES_DIR" ]; then
         readonly PACKAGES_DIR="$PREFER_PACKAGES_DIR/packages"
     else
         readonly PACKAGES_DIR="$PREFER_PACKAGES_DIR"
     fi
-elif config_has "LUMINOVA_PACKAGE_DIR"; then
-    readonly PACKAGES_DIR="$(config_get LUMINOVA_PACKAGE_DIR)"
+elif config_has "PHPVCI_PACKAGE_DIR"; then
+    readonly PACKAGES_DIR="$(config_get PHPVCI_PACKAGE_DIR)"
 else
-    readonly PACKAGES_DIR="$SCRIPT_DIR/packages"
+    packages_dir="$(package_dir "$SCRIPT_DIR")" || exit 1
+    readonly PACKAGES_DIR="$packages_dir"
+    unset packages_dir
 fi
 
 export CONFIG_FILE="$(config_get_file)"
@@ -258,7 +262,7 @@ _require_cmds
 
 # Only root user can run install and update commands
 if ! _is_root; then
-    _print "Luminova VCI '$COMMAND' command requires root privileges." error 0 1
+    _print "phpvci '$COMMAND' command requires root privileges." error 0 1
     _print "Try: sudo $(_cmd "$@")" plain 0 1
 
     exit 1
@@ -369,7 +373,7 @@ _command_action_in "$COMMAND_ACTION" "$COMMAND" "$SELF_NAME" install update
 # Package update module check
 if [ "$COMMAND_ACTION" = "update" ]; then
     package_installed "$RELEASES_DIR" || {
-        _print "No installed luminova package to update" warn
+        _print "No installed package module to update" warn
         _print "Run command '$SELF_NAME --install' first"
         exit 1
     }
