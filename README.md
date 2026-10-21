@@ -1,21 +1,21 @@
-![PHP Luminova VCI](https://github.com/luminovang/phpvci-admin/blob/main/logo.svg?v=2)
+![PHP VCI](https://github.com/phpvci/admin/blob/main/logo.svg?v=2)
 
-# PHP Luminova — Version Control Interface (VCI)
+# PHP Version Control Interface (VCI)
 
-A lightweight tool for managing shared Luminova PHP framework installations across one or more
+A lightweight tool for managing shared PHP framework installations across one or more
 projects on a single server.
 
 ---
 
 ## What problem does this solve?
 
-Normally, each PHP project carries its own copy of the Luminova framework. That means:
+Normally, each PHP project carries its own copy of framework modules. That means:
 
 - The same files duplicated across every project
 - Framework updates applied one project at a time
 - No easy way to roll back if an update breaks something
 
-**Luminova VCI solves this by installing the framework once** into a shared directory. Every
+**PHP VCI solves this by installing the framework module once** into a shared directory. Every
 project points to that shared copy. When you update or switch versions, all projects follow
 immediately — no per-project changes needed.
 
@@ -154,7 +154,7 @@ After installation, your directory will look like this:
 
 ## Installing a framework release
 
-Once the VCI itself is installed, use it to install Luminova framework versions.
+Once the phpvic itself is installed, use it to install Luminova framework versions.
 
 **Install the latest version** (auto-detected from git tags):
 
