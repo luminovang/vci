@@ -1,12 +1,12 @@
 """
-cli.py — Command-line interface for the Luminova Version Control Interface.
+cli.py — Command-line interface for the PHP Version Control Interface.
 
-Translates Python argparse arguments into the equivalent luminova.sh flags
+Translates Python argparse arguments into the equivalent phpvci.sh flags
 and delegates execution to runner.run_or_exit().
 
 Entry point (defined in pyproject.toml):
   [project.scripts]
-  luminova = "luminova.cli:main"
+  phpvci = "phpvci.cli:main"
 """
 
 from __future__ import annotations
@@ -19,14 +19,14 @@ from . import runner
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="luminova",
+        prog="phpvci",
         description=(
             "Luminova Version Control Interface — manages versioned deployments "
             "of the Luminova PHP framework across a shared installation directory."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
-            "Run 'luminova package --help' or 'luminova self --help' "
+            "Run 'phpvci package --help' or 'phpvci self --help' "
             "for command-specific options."
         ),
     )
@@ -61,22 +61,22 @@ def _build_parser() -> argparse.ArgumentParser:
         description="Manage shared Luminova PHP framework releases.",
         epilog="""
 Examples:
-  luminova package --install
-  luminova package --install=3.8.0
-  luminova package --install=3.8.0 --runtime=root
-  luminova package --install=3.8.0 --path=/etc/luminova/packages
-  luminova package --install=3.8.0 --delete
-  luminova package --install=3.8.0 --lock
-  luminova package --install=3.8.0 --lock-mode=755
-  luminova package --update
-  luminova package --update=3.9.0
-  luminova package --update=3.9.0 --force
-  luminova package --switch=3.8.0
-  luminova package --list
-  luminova package --current
-  luminova package --remove
-  luminova package --remove=3.7.8
-  luminova package --remove=repo
+  phpvci package --install
+  phpvci package --install=3.8.0
+  phpvci package --install=3.8.0 --runtime=root
+  phpvci package --install=3.8.0 --path=/etc/phpvci/packages
+  phpvci package --install=3.8.0 --delete
+  phpvci package --install=3.8.0 --lock
+  phpvci package --install=3.8.0 --lock-mode=755
+  phpvci package --update
+  phpvci package --update=3.9.0
+  phpvci package --update=3.9.0 --force
+  phpvci package --switch=3.8.0
+  phpvci package --list
+  phpvci package --current
+  phpvci package --remove
+  phpvci package --remove=3.7.8
+  phpvci package --remove=repo
 """,
     )
 
@@ -179,11 +179,11 @@ Examples:
         description="Manage the Luminova VCI script itself.",
         epilog="""
 Examples:
-  luminova self --install
-  luminova self --update
-  luminova self --update --branch=v2.1.0
-  luminova self --uninstall
-  luminova self --uninstall --purge
+  phpvci self --install
+  phpvci self --update
+  phpvci self --update --branch=v2.1.0
+  phpvci self --uninstall
+  phpvci self --uninstall --purge
 """,
     )
 
@@ -191,7 +191,7 @@ Examples:
     slf_action.add_argument(
         "-i", "--install",
         action="store_true",
-        help="Install this script as 'luminova' in PATH",
+        help="Install this script as 'phpvci' in PATH",
     )
     slf_action.add_argument(
         "-u", "--update",
@@ -203,7 +203,7 @@ Examples:
     slf_action.add_argument(
         "-ui", "--uninstall",
         action="store_true",
-        help="Remove the installed 'luminova' binary or main installation",
+        help="Remove the installed 'phpvci' binary or main installation",
     )
 
     slf.add_argument(
@@ -221,7 +221,7 @@ Examples:
     slf.add_argument(
         "-p", "--purge",
         action="store_true",
-        help="Also remove vci.conf when running --uninstall",
+        help="Also remove config.conf when running --uninstall",
     )
 
     return parser
@@ -290,7 +290,7 @@ def _package_commands(args: argparse.Namespace, flags: list[str]) -> list[str]:
 
 
 def _build_shell_args(args: argparse.Namespace) -> list[str]:
-    """Convert parsed arguments into luminova.sh CLI flags."""
+    """Convert parsed arguments into vci.sh CLI flags."""
 
     # ── Global informational flags ────────────────────────────
     if getattr(args, "version", False):
@@ -315,7 +315,7 @@ def _build_shell_args(args: argparse.Namespace) -> list[str]:
 
 
 def main(argv: list[str] | None = None) -> None:
-    """Parse arguments and delegate to luminova.sh via runner."""
+    """Parse arguments and delegate to phpvci.sh via runner."""
     parser = _build_parser()
     args = parser.parse_args(argv)
 
