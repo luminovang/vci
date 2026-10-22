@@ -324,7 +324,7 @@ package_current_release() {
 
     if [ ! -L "$link" ] && [ ! -d "$link" ]; then
         _print "No active release found. Nothing has been deployed yet." info 1
-        exit 0
+        exit 1
     fi
 
     local resolved current
