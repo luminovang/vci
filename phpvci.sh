@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ------------------------------------------------------------
-# PHP Version Control Installation
+# PHP Version Control Interface
 # ------------------------------------------------------------
 # Manages versioned deployments of the PHP framework
 # across a shared installation directory.
@@ -30,7 +30,6 @@ readonly PRODUCTION=1
 
 # Framework repo
 readonly PACKAGE_REPO_URL="https://github.com/luminovang/framework.git"
-#readonly PACKAGE_REPO_URL="/Applications/XAMPP/xamppfiles/htdocs/luminova.code"
 
 readonly _OS="$(uname -s)"
 readonly SCRIPT_ENTRY="${BASH_SOURCE[0]}"
