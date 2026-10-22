@@ -4,7 +4,7 @@
 
 A lightweight tool for managing shared Luminova PHP framework installations across one or more projects on a single server.
 
-This file covers the command line tool, `phpvci.sh`. The browser based admin panel, is documented in [ADMIN.README.md](ADMIN.README.md).
+This file covers the command line tool, `phpvci.sh`. The browser based admin panel, is documented in [ADMIN README.md](admin/README.md).
 
 ---
 
