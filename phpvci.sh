@@ -30,6 +30,7 @@ readonly PRODUCTION=1
 
 # Framework repo
 readonly PACKAGE_REPO_URL="https://github.com/luminovang/framework.git"
+#readonly PACKAGE_REPO_URL="/Applications/XAMPP/xamppfiles/htdocs/luminova.code"
 
 readonly _OS="$(uname -s)"
 readonly SCRIPT_ENTRY="${BASH_SOURCE[0]}"
@@ -145,19 +146,19 @@ _paths() {
         case "$where" in
             packages)
                 _print "$path"
-                exit 1
+                exit 0
                 ;;
             release)
                 _print "$path/release"
-                exit 1
+                exit 0
                 ;;
             current)
                 _print "$path/current"
-                exit 1
+                exit 0
                 ;;
             repo)
                 _print "$path/repo"
-                exit 1
+                exit 0
                 ;;
             *)
                 _print "Invalid where command target '$where'" error
