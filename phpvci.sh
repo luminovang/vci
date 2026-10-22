@@ -149,7 +149,7 @@ _paths() {
                 exit 0
                 ;;
             release)
-                _print "$path/release"
+                _print "$path/releases"
                 exit 0
                 ;;
             current)
